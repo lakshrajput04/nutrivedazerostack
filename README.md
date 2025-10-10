@@ -1,282 +1,89 @@
-# 🌿 NutriVeda - AI-Powered Ayurvedic Nutrition Platform
+# Getting Started with Create React App
 
-A comprehensive full-stack application for personalized Ayurvedic diet planning with AI integration, featuring beautiful React frontend and robust Node.js backend.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## ✨ Features
+## Environment Configuration
 
-### 🎯 Core Features
-- **Multi-Step Patient Registration**: Beautiful 6-step form with real-time BMI/BMR calculation
-- **AI Diet Generation**: OpenAI-powered personalized 14-day Ayurvedic diet plans
-- **Interactive Diet Plan Editor**: View, edit, and customize AI-generated plans
-- **PDF Generation**: Download professionally formatted diet plans
-- **Beautiful UI**: Modern gradient design with Tailwind CSS
-- **Responsive Design**: Works perfectly on all devices
+Before running the application, you need to configure the environment variables:
 
-### 🤖 AI Integration
-- Personalized diet plans based on patient's dosha, health conditions, and preferences
-- Ayurvedic principles integration
-- 14-day meal planning with timing and calorie information
-- Customizable based on dietary restrictions and goals
+1. Copy `.env.example` to `.env`:
+   ```bash
+   copy .env.example .env
+   ```
 
-### 🎨 UI/UX Features
-- **Emerald/Teal Gradient Theme**: Professional and calming design
-- **Step-by-step Progress**: Visual indicators for form completion
-- **Real-time Validation**: Instant feedback on form inputs
-- **Interactive Components**: Smooth animations and transitions
-- **Mobile-First Design**: Optimized for all screen sizes
+2. Update the `.env` file with your backend URL:
+   ```
+   REACT_APP_API_URL=https://nutriveda-backend.onrender.com
+   ```
 
-## 🏗️ Architecture
-
-### Frontend (React - Port 3000)
+For local development, use:
 ```
-nutriveda-frontend/
-├── src/
-│   ├── pages/
-│   │   ├── PatientForm.jsx          # 6-step registration form
-│   │   ├── DietPlanGenerator.jsx    # AI diet plan interface
-│   │   └── ...
-│   ├── components/
-│   │   └── ...
-│   └── App.js                       # Main routing
+REACT_APP_API_URL=http://localhost:5000
 ```
 
-### Backend (Node.js - Port 5000)
-```
-nutriveda-backend/
-├── src/
-│   ├── controllers/
-│   │   ├── aiDietController.js      # AI diet generation
-│   │   ├── patientController.js     # Patient management
-│   │   └── pdfController.js         # PDF generation
-│   ├── models/
-│   │   ├── Patient.js               # Patient schema
-│   │   ├── DietChart.js             # Diet chart schema
-│   │   └── ...
-│   ├── routes/
-│   │   ├── aiDiet.js                # AI diet routes
-│   │   ├── patient.js               # Patient routes
-│   │   └── pdf.js                   # PDF routes
-│   └── services/
-│       ├── csvService.js            # CSV processing
-│       └── pdfService.js            # PDF generation
-```
+## Available Scripts
 
-## 🚀 Getting Started
+In the project directory, you can run:
 
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- OpenAI API Key
-- Firebase Account (optional, for authentication)
+### `npm start`
 
-### Installation
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/MaheshVaviya/Nutri-Veda.git
-cd Nutri-Veda
-```
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-2. **Setup Backend**
-```bash
-cd nutriveda-backend
-npm install
-```
+### `npm test`
 
-3. **Setup Frontend**
-```bash
-cd ../nutriveda-frontend
-npm install
-```
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-4. **Environment Configuration**
-   
-   Edit `nutriveda-backend/.env`:
-```env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
+### `npm run build`
 
-# OpenAI Configuration (Required for AI features)
-OPENAI_API_KEY=your_openai_api_key_here
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-# Firebase Configuration (Optional)
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_PRIVATE_KEY=your_private_key
-FIREBASE_CLIENT_EMAIL=your_client_email
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRE=7d
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-# API Configuration
-API_BASE_URL=http://localhost:5000/api/v1
-```
+### `npm run eject`
 
-### Running the Application
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-1. **Start Backend Server** (Terminal 1)
-```bash
-cd nutriveda-backend
-npm start
-```
-Server runs on: http://localhost:5000
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-2. **Start Frontend Development Server** (Terminal 2)
-```bash
-cd nutriveda-frontend
-npm start
-```
-Frontend runs on: http://localhost:3000
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-## 📋 Usage Guide
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-### 1. Patient Registration
-1. Navigate to http://localhost:3000
-2. Fill out the 6-step registration form:
-   - **Step 1**: Personal Information (Name, Email, Phone, Age, Gender)
-   - **Step 2**: Health Information (Height, Weight, Activity Level, Medical History)
-   - **Step 3**: Dietary Information (Diet Type, Preferences, Water Intake)
-   - **Step 4**: Ayurvedic Information (Dosha, Sleep Pattern, Stress Level)
-   - **Step 5**: Goals and Preferences (Target Weight, Budget, Cooking Time)
-   - **Step 6**: Additional Information (Previous Diets, Supplements, Notes)
+## Learn More
 
-### 2. AI Diet Plan Generation
-1. After registration, you'll be redirected to the Diet Plan Generator
-2. Click "Generate AI Diet Plan" to create a personalized 14-day plan
-3. The AI will analyze patient data and generate:
-   - Customized meal plans for 14 days
-   - Daily calorie breakdowns
-   - Ayurvedic tips and guidelines
-   - Meal timing recommendations
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### 3. Diet Plan Management
-- **View Mode**: See the complete generated plan
-- **Edit Mode**: Modify meals, add/remove items
-- **Save Changes**: Update the plan with your modifications
-- **Download PDF**: Generate and download a professional PDF
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-## 🔌 API Endpoints
+### Code Splitting
 
-### Patient Management
-- `POST /api/v1/patients` - Register new patient
-- `GET /api/v1/patients/:id` - Get patient details
-- `PUT /api/v1/patients/:id` - Update patient information
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### AI Diet Generation
-- `POST /api/v1/ai-diet/generate/:patientId` - Generate AI diet plan
-- `GET /api/v1/ai-diet/patient/:patientId` - Get existing diet plan
-- `PUT /api/v1/ai-diet/save/:patientId` - Save/update diet plan
+### Analyzing the Bundle Size
 
-### PDF Generation
-- `POST /api/v1/pdf/generate/:patientId` - Generate diet plan PDF
-- `GET /api/v1/pdf/download/:fileName` - Download PDF file
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-## 🎨 Design System
+### Making a Progressive Web App
 
-### Color Palette
-- **Primary**: Emerald/Teal gradient (#059669, #0d9488)
-- **Secondary**: Orange/Red accents (#f59e0b, #ef4444)
-- **Background**: Gradient from emerald-50 to teal-50
-- **Text**: Gray scale (gray-700, gray-600, gray-500)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Typography
-- **Headings**: Inter/System fonts, bold weights
-- **Body**: Clean, readable spacing
-- **Buttons**: Medium weight, proper contrast
+### Advanced Configuration
 
-### Components
-- **Cards**: White/70 opacity with backdrop blur
-- **Forms**: Consistent padding, rounded corners
-- **Buttons**: Gradient backgrounds with hover effects
-- **Progress**: Visual step indicators
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-## 🧪 Key Technologies
+### Deployment
 
-### Frontend Stack
-- **React 19**: Latest React with hooks
-- **React Router DOM**: Client-side routing
-- **Tailwind CSS**: Utility-first styling
-- **Lucide React**: Beautiful icon library
-- **Axios**: HTTP client for API calls
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### Backend Stack
-- **Node.js & Express**: Server framework
-- **OpenAI API**: AI-powered diet generation
-- **PDFKit**: PDF generation library
-- **Firebase Admin**: Authentication & database
-- **CORS & Helmet**: Security middleware
+### `npm run build` fails to minify
 
-## 🔧 Development Features
-
-### Code Quality
-- **ESLint**: Code linting and formatting
-- **React Strict Mode**: Development warnings
-- **Error Boundaries**: Graceful error handling
-- **Environment Variables**: Secure configuration
-
-### Performance
-- **Code Splitting**: Optimized bundle sizes
-- **Lazy Loading**: Component-level loading
-- **Memoization**: Optimized re-renders
-- **API Caching**: Reduced server requests
-
-## 📱 Responsive Design
-
-- **Mobile First**: Optimized for mobile devices
-- **Tablet Support**: Perfect medium screen experience
-- **Desktop Enhanced**: Full feature set on large screens
-- **Touch Friendly**: Proper touch targets and gestures
-
-## 🔒 Security Features
-
-- **Input Validation**: Frontend and backend validation
-- **CORS Protection**: Configured for security
-- **Environment Variables**: Sensitive data protection
-- **Error Handling**: No data leakage in errors
-
-## 🚀 Deployment
-
-### Frontend Deployment
-```bash
-cd nutriveda-frontend
-npm run build
-# Deploy build folder to your hosting service
-```
-
-### Backend Deployment
-```bash
-cd nutriveda-backend
-# Set production environment variables
-NODE_ENV=production PORT=5000 npm start
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Mahesh Vaviya**
-- GitHub: [@MaheshVaviya](https://github.com/MaheshVaviya)
-
-## 🙏 Acknowledgments
-
-- OpenAI for AI capabilities
-- Tailwind CSS for beautiful styling
-- Lucide React for icon library
-- React community for excellent documentation
-
----
-
-<div align="center">
-  <h3>🌿 Built with ❤️ for better health through Ayurvedic nutrition</h3>
-</div>
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
