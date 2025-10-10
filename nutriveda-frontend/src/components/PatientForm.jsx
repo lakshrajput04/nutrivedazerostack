@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, Mail, Calendar, Scale, Ruler, Activity } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api/v1';
+const API_BASE = process.env.REACT_APP_API_URL + '/api/v1';
 
 const PatientForm = () => {
   const navigate = useNavigate();

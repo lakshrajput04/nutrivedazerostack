@@ -6,7 +6,7 @@ import {
   ChevronDown, ChevronUp, Calendar, FileText
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api/v1';
+const API_BASE = process.env.REACT_APP_API_URL + '/api/v1';
 
 const DietPlanGenerator = () => {
   const [searchParams] = useSearchParams();
@@ -156,7 +156,7 @@ const DietPlanGenerator = () => {
         
         // Create download link
         const downloadLink = document.createElement('a');
-        downloadLink.href = `http://localhost:5000${result.data.downloadUrl}`;
+        downloadLink.href = `${process.env.REACT_APP_API_URL}${result.data.downloadUrl}`;
         downloadLink.download = result.data.fileName;
         document.body.appendChild(downloadLink);
         downloadLink.click();

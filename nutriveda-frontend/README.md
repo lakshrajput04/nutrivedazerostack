@@ -2,6 +2,25 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Environment Configuration
+
+Before running the application, you need to configure the environment variables:
+
+1. Copy `.env.example` to `.env`:
+   ```bash
+   copy .env.example .env
+   ```
+
+2. Update the `.env` file with your backend URL:
+   ```
+   REACT_APP_API_URL=https://nutriveda-backend.onrender.com
+   ```
+
+For local development, use:
+```
+REACT_APP_API_URL=http://localhost:5000
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
