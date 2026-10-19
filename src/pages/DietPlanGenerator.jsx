@@ -5,8 +5,7 @@ import {
   Clock, Utensils, 
   ChevronDown, ChevronUp, Calendar, FileText
 } from 'lucide-react';
-
-const API_BASE = process.env.REACT_APP_API_URL + '/api/v1';
+import { API_BASE } from '../config/api';
 
 const DietPlanGenerator = () => {
   const [searchParams] = useSearchParams();
@@ -143,30 +142,31 @@ const DietPlanGenerator = () => {
 
     try {
       const response = await fetch(`${API_BASE}/pdf/generate/${patientId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        method: 'POST'
       });
 
-      const result = await response.json();
-
       if (response.ok) {
-        setMessage('✅ PDF generated successfully!');
-        
-        // Create download link
+        // The API returns the PDF itself in the response body
+        const blob = await response.blob();
+        const fileName = response.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1]
+          || `diet_plan_${patientId}.pdf`;
+        const url = URL.createObjectURL(blob);
+
         const downloadLink = document.createElement('a');
-        downloadLink.href = `${process.env.REACT_APP_API_URL}${result.data.downloadUrl}`;
-        downloadLink.download = result.data.fileName;
+        downloadLink.href = url;
+        downloadLink.download = fileName;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        
+        URL.revokeObjectURL(url);
+
+        setMessage('✅ PDF generated successfully!');
         setTimeout(() => {
           setMessage('');
         }, 3000);
       } else {
-        setMessage(`❌ ${result.message}`);
+        const result = await response.json().catch(() => ({}));
+        setMessage(`❌ ${result.message || 'Failed to generate PDF'}`);
       }
     } catch (error) {
       setMessage(`❌ Error generating PDF: ${error.message}`);

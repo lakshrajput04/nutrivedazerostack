@@ -1,24 +1,43 @@
-# Getting Started with Create React App
+# NutriVeda
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ayurvedic diet-planning app: a React (Create React App) frontend plus an Express API,
+deployed together on Vercel. The API runs as a single serverless function
+(`api/index.js` → `server/app.js`) and stores data in Firestore; diet plans are
+generated with Google Gemini.
 
-## Environment Configuration
+## Project layout
 
-Before running the application, you need to configure the environment variables:
+- `src/` - React frontend
+- `server/` - Express API (routes, controllers, Firestore models, PDF service, sample CSV data)
+- `api/index.js` - Vercel function that serves the Express app for every `/api/*` request
+- `vercel.json` - rewrites `/api/*` to the function and everything else to the SPA
 
-1. Copy `.env.example` to `.env`:
-   ```bash
-   copy .env.example .env
-   ```
+## Environment variables
 
-2. Update the `.env` file with your backend URL:
-   ```
-   REACT_APP_API_URL=https://nutriveda-backend.onrender.com
-   ```
+Copy `.env.example` to `.env` for local development. On Vercel, add the same
+variables under Project Settings > Environment Variables:
 
-For local development, use:
-```
-REACT_APP_API_URL=http://localhost:5000
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `FIREBASE_PROJECT_ID` | yes | From the Firebase service-account JSON |
+| `FIREBASE_CLIENT_EMAIL` | yes | From the Firebase service-account JSON |
+| `FIREBASE_PRIVATE_KEY` | yes | The `private_key` value, with `
+` line breaks |
+| `GEMINI_API_KEY` | yes | Google AI Studio key |
+| `GEMINI_MODEL` | no | Defaults to `gemini-flash-latest` |
+| `JWT_SECRET` | no | Only for the `/api/v1/auth` endpoints |
+| `REACT_APP_API_URL` | no | Leave unset; the frontend calls `/api` on the same origin |
+
+`GET /api/health` reports which required variables are missing.
+
+Never commit `.env` or service-account keys.
+
+## Local development
+
+```bash
+npm install
+npm run server   # API on http://localhost:5000
+npm start        # frontend on http://localhost:3000, proxies /api to the API
 ```
 
 ## Available Scripts

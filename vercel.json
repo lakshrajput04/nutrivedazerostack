@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 120,
+      "includeFiles": "server/{sample_data,assets}/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}

@@ -1,9 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Brain, FileText, Plus, Activity } from 'lucide-react';
+import { Users, Brain, FileText, Plus } from 'lucide-react';
 import TotalPatientsCount from '../components/counters/TotalPatientsCount';
 import TotalDietPlansCount from '../components/counters/TotalDietPlansCount';
-import ActivePlansCount from '../components/counters/ActivePlansCount';
 
 const Dashboard = () => {
   const navigate = useNavigate();

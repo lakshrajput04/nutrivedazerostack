@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, Mail, Calendar, Scale, Ruler, Activity } from 'lucide-react';
-
-const API_BASE = process.env.REACT_APP_API_URL + '/api/v1';
+import { API_BASE } from '../config/api';
 
 const PatientForm = () => {
   const navigate = useNavigate();
@@ -126,7 +125,7 @@ const PatientForm = () => {
           endpoint = '/patient-registration/register/step3';
           payload = {
             sessionId,
-            dosha: formData.dosha || '', // Make dosha optional
+            dosha: formData.dosha,
             dietary_habits: formData.dietary_habits,
             height: parseFloat(formData.height),
             weight: parseFloat(formData.weight),
@@ -190,7 +189,7 @@ const PatientForm = () => {
           // Registration complete - navigate to diet plan generation
           setMessage('✅ Registration completed! Redirecting to diet plan generation...');
           setTimeout(() => {
-            navigate(`/diet-plans?patientId=${result.data.patient.id}&name=${result.data.patient.name}`);
+            navigate(`/diet-plans?patientId=${result.data.patient.id}&name=${encodeURIComponent(result.data.patient.name)}`);
           }, 2000);
         } else {
           setMessage(`✅ ${result.message}`);
@@ -332,7 +331,7 @@ const PatientForm = () => {
                       className="w-full px-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="+91-XXXXXXXXXX"
+                      placeholder="10-digit mobile number"
                     />
                   </div>
                 </div>
@@ -399,7 +398,7 @@ const PatientForm = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Dosha Constitution (Optional)
+                      Dosha Constitution *
                     </label>
                     <select
                       name="dosha"
@@ -412,9 +411,9 @@ const PatientForm = () => {
                       <option value="vata">Vata (Air + Space)</option>
                       <option value="pitta">Pitta (Fire + Water)</option>
                       <option value="kapha">Kapha (Earth + Water)</option>
-                      <option value="vata-pitta">Vata-Pitta</option>
-                      <option value="pitta-kapha">Pitta-Kapha</option>
-                      <option value="vata-kapha">Vata-Kapha</option>
+                      <option value="vata_pitta">Vata-Pitta</option>
+                      <option value="pitta_kapha">Pitta-Kapha</option>
+                      <option value="vata_kapha">Vata-Kapha</option>
                       <option value="tridoshic">Tridoshic (Balanced)</option>
                     </select>
                   </div>

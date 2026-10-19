@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '../../config/api';
 
 const TotalPatientsCount = () => {
   const [count, setCount] = useState(0);
@@ -7,7 +8,7 @@ const TotalPatientsCount = () => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/v1/patients/count`);
+        const response = await axios.get(`${API_URL}/api/counts/count`);
         setCount(response.data.count);
       } catch (error) {
         console.error('Error fetching patient count:', error);
