@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Download, Pencil, Plus, Save, Sparkles, X, Clock, Leaf, ListChecks } from 'lucide-react';
 import { Button, Card, DoshaBadge, EmptyState, Notice, Spinner } from '../components/ui';
 import { apiRequest } from '../lib/api';
 import { API_BASE } from '../config/api';
 import { capitalize, formatBmi, formatDate } from '../lib/format';
+import GeneratorHome from './GeneratorHome';
 
 const MEALS = [
   ['breakfast', 'Breakfast'],
@@ -138,7 +139,8 @@ const DietPlanGenerator = () => {
     });
   }, [patientId]);
 
-  if (!patientId) return <Navigate to="/patients" replace />;
+  // Without a patient this is the generator's start page: pick who to plan for
+  if (!patientId) return <GeneratorHome />;
 
   const plan = chart?.dietPlan;
   const days = plan?.days || [];
@@ -226,13 +228,16 @@ const DietPlanGenerator = () => {
 
   return (
     <>
-      <Link to="/patients" className="mb-4 inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-800">
-        <ArrowLeft className="h-4 w-4" /> Patients
+      <Link to="/diet-plans" className="mb-4 inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-800">
+        <ArrowLeft className="h-4 w-4" /> AI Diet Plan Generator
       </Link>
 
       {/* Patient header */}
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
+          <p className="mb-1 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-brand-700">
+            <Sparkles className="h-3.5 w-3.5" /> AI Diet Plan Generator
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold tracking-tight text-ink-900">{name}</h1>
             {patient?.dosha && <DoshaBadge dosha={patient.dosha} />}

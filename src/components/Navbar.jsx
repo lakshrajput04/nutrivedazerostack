@@ -2,7 +2,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
 
 const navLinkClass = ({ isActive }) =>
-  `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+  `whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium transition-colors sm:px-3 ${
     isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-ink-100 hover:text-ink-900'
   }`;
 
@@ -11,15 +11,19 @@ const Navbar = () => (
     <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-6 sm:px-6">
       <Link to="/" className="flex flex-shrink-0 items-center gap-2">
         <img src="/nutriveda-logo.png" alt="" className="h-8 w-8 rounded-full" />
-        <span className="hidden text-base font-semibold text-ink-900 sm:inline">NutriVeda</span>
+        <span className="hidden text-base font-semibold text-ink-900 md:inline">NutriVeda</span>
       </Link>
 
-      <nav className="flex items-center gap-1">
+      <nav className="flex items-center gap-0.5 sm:gap-1">
         <NavLink to="/" end className={navLinkClass}>
           Dashboard
         </NavLink>
         <NavLink to="/patients" end className={navLinkClass}>
           Patients
+        </NavLink>
+        <NavLink to="/diet-plans" className={navLinkClass}>
+          <span className="sm:hidden">Generator</span>
+          <span className="hidden sm:inline">Diet Plan Generator</span>
         </NavLink>
       </nav>
 
