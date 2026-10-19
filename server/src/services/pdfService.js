@@ -338,6 +338,11 @@ Generate complete meal plans for all 7 days with specific foods and calories.`;
           bufferPages: true
         });
 
+        // The built-in Helvetica font can't draw emoji and prints them as
+        // garbage, so strip unsupported characters from every text call
+        const drawText = doc.text.bind(doc);
+        doc.text = (text, ...args) => drawText(typeof text === 'string' ? this.toPdfText(text) : text, ...args);
+
         // Build the PDF in memory; serverless functions have no persistent disk
         const fileName = outputPath || `diet_plan_${patientData._id || patientData.id}_${Date.now()}.pdf`;
         const chunks = [];
@@ -426,6 +431,14 @@ Generate complete meal plans for all 7 days with specific foods and calories.`;
         reject(error);
       }
     });
+  }
+
+  // Keep only characters the standard PDF fonts can render (Latin-1 plus
+  // common punctuation such as bullets, dashes and curly quotes)
+  static toPdfText(text) {
+    return text
+      .replace(/[^\x00-\xFF–—‘’“”•…]/g, '')
+      .replace(/^\s+/, '');
   }
 
   static addHeader(doc) {
@@ -704,7 +717,7 @@ Generate complete meal plans for all 7 days with specific foods and calories.`;
           if (day.dosha_focus) {
             doc.fontSize(9)
                .fillColor('#6b7280')
-               .text(day.dosha_focus, 60, dayHeaderY + 22);
+               .text(day.dosha_focus, 200, dayHeaderY + 23, { width: 340 }); // under the total, clear of the day title
           }
           
           doc.y = dayHeaderY + 45;
@@ -750,18 +763,23 @@ Generate complete meal plans for all 7 days with specific foods and calories.`;
             
             // Items (cleaned up and formatted)
             let itemY = mealStartY + 30;
+            const itemsBottom = mealStartY + 102; // keep clear of the calories line
             if (meal.items && Array.isArray(meal.items)) {
-              meal.items.slice(0, 4).forEach((item) => { // Limit to 4 items per meal for space
-                let cleanItem = item.replace(/🍽️|•/g, '').trim();
+              doc.fontSize(8);
+              for (const item of meal.items.slice(0, 4)) { // Limit to 4 items per meal for space
+                let cleanItem = this.toPdfText(String(item)).replace(/•/g, '').trim();
                 if (cleanItem.length > 25) cleanItem = cleanItem.substring(0, 22) + '...';
-                
-                if (cleanItem.length > 0) {
-                  doc.fontSize(8)
-                     .fillColor('#374151')
-                     .text(`• ${cleanItem}`, mealX + 5, itemY, { width: mealWidth - 10 });
-                  itemY += 10;
-                }
-              });
+                if (cleanItem.length === 0) continue;
+
+                // Advance by the wrapped height so long names don't overlap the next item
+                const text = `• ${cleanItem}`;
+                const height = doc.heightOfString(text, { width: mealWidth - 10 });
+                if (itemY + height > itemsBottom) break;
+
+                doc.fillColor('#374151')
+                   .text(text, mealX + 5, itemY, { width: mealWidth - 10 });
+                itemY += height + 2;
+              }
             }
             
             // Calories at bottom
