@@ -1,54 +1,37 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './Navbar.css';
+import { Link, NavLink } from 'react-router-dom';
+import { UserPlus } from 'lucide-react';
 
-const Navbar = () => {
-  return (
-    <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <img
-                className="h-12 w-auto"
-                src="/nutriveda-logo.png"
-                alt="NutriVeda"
-              />
-              <span className="ml-2 text-2xl font-semibold text-gray-900">NutriVeda</span>
-            </Link>
-          </div>
-          <div className="flex items-center">
-            <div className="hidden md:ml-6 md:flex md:space-x-8">
-              <Link
-                to="/dashboard"
-                className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/patients"
-                className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-              >
-                Patients
-              </Link>
-              <Link
-                to="/diet-plans"
-                className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-              >
-                Diet Plans
-              </Link>
-              <Link
-                to="/recipes"
-                className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-              >
-                Recipes
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-};
+const navLinkClass = ({ isActive }) =>
+  `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+    isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-ink-100 hover:text-ink-900'
+  }`;
+
+const Navbar = () => (
+  <header className="sticky top-0 z-20 border-b border-ink-200 bg-white/90 backdrop-blur">
+    <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-6 sm:px-6">
+      <Link to="/" className="flex flex-shrink-0 items-center gap-2">
+        <img src="/nutriveda-logo.png" alt="" className="h-8 w-8 rounded-full" />
+        <span className="hidden text-base font-semibold text-ink-900 sm:inline">NutriVeda</span>
+      </Link>
+
+      <nav className="flex items-center gap-1">
+        <NavLink to="/" end className={navLinkClass}>
+          Dashboard
+        </NavLink>
+        <NavLink to="/patients" end className={navLinkClass}>
+          Patients
+        </NavLink>
+      </nav>
+
+      <Link
+        to="/patients/register"
+        className="ml-auto inline-flex h-9 items-center gap-2 rounded-lg bg-brand-600 px-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700"
+      >
+        <UserPlus className="h-4 w-4" />
+        <span className="hidden sm:inline">New patient</span>
+      </Link>
+    </div>
+  </header>
+);
 
 export default Navbar;

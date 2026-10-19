@@ -187,6 +187,7 @@ Patient Information:
 - BMI: ${patient.bmi}
 - BMR: ${patient.bmr} cal/day
 - Target Calories: ${targetCalories} cal/day (based on ${patient.activityLevel || 'moderate'} activity)
+- Weight Goal: ${(patient.weight_goal || 'weight_maintenance').replace('_', ' ')}
 - Digestion: ${patient.digestion || 'normal'}
 - Water Intake: ${patient.waterIntake || '2-3 liters'}
 - Lifestyle: ${patient.activityLevel || 'moderate'}
@@ -537,6 +538,26 @@ Make this a complete, authentic Ayurvedic meal plan using your expertise in trad
         success: false,
         message: `Error generating diet chart: ${error.message}`
       });
+    }
+  }
+
+  // Which patients have a saved plan: { [patientId]: { generatedAt, status } } for the latest chart
+  static async getPlanSummary(req, res) {
+    try {
+      const charts = await db.findAllFields('aiDietCharts', ['patientId', 'generatedAt', 'status']);
+      const summary = {};
+      for (const chart of charts) {
+        if (!chart.patientId) continue;
+        const generatedAt = toDate(chart.generatedAt);
+        const current = summary[chart.patientId];
+        if (!current || generatedAt > new Date(current.generatedAt)) {
+          summary[chart.patientId] = { generatedAt: generatedAt.toISOString(), status: chart.status || 'active' };
+        }
+      }
+      res.status(200).json({ success: true, data: summary });
+    } catch (error) {
+      console.error('Plan summary error:', error);
+      res.status(500).json({ success: false, message: `Error loading plan summary: ${error.message}` });
     }
   }
 

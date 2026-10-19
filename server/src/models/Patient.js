@@ -174,6 +174,7 @@ class Patient {
       // Digestive Health
       digestion: patientData.digestion || patientData.digestiveHealth || 'regular', // strong, weak, irregular, regular
       waterIntake: parseFloat(patientData.waterIntake || 2.5), // liters per day
+      weight_goal: patientData.weight_goal || 'weight_maintenance', // weight_loss, weight_maintenance, weight_gain
       
       // Lifestyle
       lifestyle: {
@@ -241,7 +242,7 @@ class Patient {
   }
 
   static async findAll() {
-    return await db.findAll(this.collection);
+    return await db.findAll(this.collection, 1000);
   }
 
   static async findByDosha(dosha) {

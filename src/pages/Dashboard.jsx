@@ -1,143 +1,111 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Users, Brain, FileText, Plus } from 'lucide-react';
-import TotalPatientsCount from '../components/counters/TotalPatientsCount';
-import TotalDietPlansCount from '../components/counters/TotalDietPlansCount';
+import { Link } from 'react-router-dom';
+import { Users, ClipboardCheck, ClipboardList, UserPlus, ArrowRight } from 'lucide-react';
+import { ButtonLink, Card, EmptyState, Notice, PageHeader, Spinner } from '../components/ui';
+import PatientTable from '../components/PatientTable';
+import usePatientsData from '../lib/usePatientsData';
+import { formatDosha } from '../lib/format';
 
-const Dashboard = () => {
-  const navigate = useNavigate();
+const RECENT_COUNT = 6;
 
-  const features = [
-    {
-      title: 'Patient Registration',
-      description: 'Register new patients with their health profiles and dosha assessment',
-      icon: Users,
-      color: 'from-blue-500 to-blue-600',
-      path: '/patients/register'
-    },
-    {
-      title: 'AI Diet Plan Generator', 
-      description: 'Generate personalized 14-day Ayurvedic diet plans using AI',
-      icon: Brain,
-      color: 'from-purple-500 to-purple-600',
-      path: '/diet-plans'
-    },
-    {
-      title: 'Diet Plans',
-      description: 'View, edit and manage existing diet plans',
-      icon: FileText,
-      color: 'from-green-500 to-green-600',
-      path: '/diet-plan-generator'
-    }
-  ];
+const greeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+};
+
+const StatTile = ({ icon: Icon, label, value, hint }) => (
+  <Card className="p-3 sm:p-5">
+    <div className="flex items-center gap-2 text-xs text-ink-500 sm:text-sm">
+      <Icon className="hidden h-4 w-4 sm:block" />
+      {label}
+    </div>
+    <div className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-ink-900 sm:mt-2 sm:text-3xl">{value}</div>
+    {hint && <div className="mt-1 hidden text-xs text-ink-500 sm:block">{hint}</div>}
+  </Card>
+);
+
+// Single-hue bar list: one bar per constitution, labelled with its count
+const DoshaBreakdown = ({ patients }) => {
+  const counts = patients.reduce((acc, p) => {
+    const key = formatDosha(p.dosha);
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const max = Math.max(...rows.map(([, n]) => n), 1);
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <div className="flex flex-col items-center justify-center mb-4">
-              <img src="/nutriveda-logo.png" alt="NutriVeda" className="h-24 w-auto mb-4" />
-              <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
-                NutriVeda
-              </h1>
-              <p className="text-xl text-gray-600 mt-2">Personalized Ayurvedic Nutrition Platform</p>
-            </div>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Personalized Ayurvedic Nutrition Platform - Combining ancient wisdom with modern AI technology
-            </p>
+    <Card className="p-5">
+      <h2 className="text-sm font-semibold text-ink-900">Patients by constitution</h2>
+      <ul className="mt-4 space-y-2.5">
+        {rows.map(([dosha, count]) => (
+          <li key={dosha} className="grid grid-cols-[6.5rem_1fr_2rem] items-center gap-3 text-sm" title={`${dosha}: ${count} patients`}>
+            <span className="truncate text-ink-600">{dosha}</span>
+            <span className="h-2 rounded-full bg-ink-100">
+              <span className="block h-2 rounded-full bg-brand-500" style={{ width: `${(count / max) * 100}%` }} />
+            </span>
+            <span className="text-right tabular-nums text-ink-700">{count}</span>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+};
+
+const Dashboard = () => {
+  const { patients, plans, loading, error } = usePatientsData();
+  const withPlan = patients.filter((p) => plans[p.id]).length;
+
+  return (
+    <>
+      <PageHeader
+        title={greeting()}
+        description="Overview of your patients and their Ayurvedic diet plans."
+      />
+
+      <Notice status={error && { type: 'error', text: `Couldn't load patients: ${error}` }} className="mb-6" />
+
+      {loading ? (
+        <Spinner label="Loading patients..." />
+      ) : (
+        <>
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+            <StatTile icon={Users} label="Patients" value={patients.length} />
+            <StatTile
+              icon={ClipboardCheck}
+              label="With a diet plan"
+              value={withPlan}
+              hint={patients.length ? `${Math.round((withPlan / patients.length) * 100)}% of patients` : undefined}
+            />
+            <StatTile icon={ClipboardList} label="Waiting for a plan" value={patients.length - withPlan} />
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-orange-100 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Patients</p>
-                  <p className="text-3xl font-bold text-orange-600">
-                    <TotalPatientsCount />
-                  </p>
-                </div>
-                <Users className="w-8 h-8 text-orange-400" />
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <Card className="overflow-hidden lg:col-span-2">
+              <div className="flex items-center justify-between border-b border-ink-200 px-5 py-4">
+                <h2 className="text-sm font-semibold text-ink-900">Recent patients</h2>
+                <Link to="/patients" className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:text-brand-800">
+                  View all <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            </div>
-            
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-purple-100 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">AI Diet Plans</p>
-                  <p className="text-3xl font-bold text-purple-600">
-                    <TotalDietPlansCount />
-                  </p>
-                </div>
-                <Brain className="w-8 h-8 text-purple-400" />
-              </div>
-            </div>
-          </div>
+              {patients.length ? (
+                <PatientTable patients={patients.slice(0, RECENT_COUNT)} plans={plans} compact />
+              ) : (
+                <EmptyState
+                  icon={Users}
+                  title="No patients yet"
+                  description="Register your first patient to generate a personalised diet plan."
+                  action={<ButtonLink to="/patients/register" icon={UserPlus}>New patient</ButtonLink>}
+                />
+              )}
+            </Card>
 
-          {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {features.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
-                  onClick={() => navigate(feature.path)}
-                >
-                  <div className="flex items-start gap-6">
-                    <div className={`p-4 rounded-2xl bg-gradient-to-r ${feature.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <IconComponent className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-600 transition-colors">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed">
-                        {feature.description}
-                      </p>
-                      <div className="mt-4">
-                        <span className="inline-flex items-center text-orange-600 font-medium group-hover:text-orange-700">
-                          Get Started 
-                          <Plus className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {patients.length > 0 && <DoshaBreakdown patients={patients} />}
           </div>
-
-          {/* Getting Started Section */}
-          <div className="mt-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl p-8 border border-orange-200">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-orange-800 mb-4">
-                Getting Started with NutriVeda
-              </h2>
-              <p className="text-orange-700 mb-8 max-w-2xl mx-auto">
-                Begin your journey with personalized Ayurvedic nutrition. Register your first patient and generate their AI-powered diet plan.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => navigate('/patients/register')}
-                  className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-lg"
-                >
-                  Register First Patient
-                </button>
-                <button
-                  onClick={() => navigate('/diet-plans')}
-                  className="px-8 py-4 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-all border-2 border-orange-200 hover:border-orange-300"
-                >
-                  Explore Diet Plans
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        </>
+      )}
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ const router = express.Router();
 
 // AI Diet Chart routes
 router.post('/generate/:patientId', DietChartController.generateDietChart);
+router.get('/summary', DietChartController.getPlanSummary);
 router.get('/patient/:patientId', DietChartController.getDietChart);
 router.put('/save/:patientId', DietChartController.saveDietChart);
 

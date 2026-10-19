@@ -69,6 +69,17 @@ class DatabaseService {
     }
   }
 
+  // Read only the given fields of every document (cheap listing of large docs)
+  async findAllFields(collection, fields) {
+    try {
+      const snapshot = await this.db.collection(collection).select(...fields).get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error(`❌ Error listing ${collection}:`, error.message);
+      throw new Error(`Error listing documents: ${error.message}`);
+    }
+  }
+
   async update(collection, id, data) {
     try {
       await this.db.collection(collection).doc(id).update({
