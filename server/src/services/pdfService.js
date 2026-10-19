@@ -5,6 +5,7 @@ const csv = require('csv-parser');
 const DietChart = require('../models/DietChart');
 const db = require('../config/database');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { getPatientProfile, humanize } = require('./patientProfile');
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 
@@ -374,6 +375,7 @@ Generate complete meal plans for all 7 days with specific foods and calories.`;
           
           // Extract patient info properly - handle different data structures
           const patient = patientData.patient || patientData;
+          const profile = getPatientProfile(patient);
           const calorieLimit = patient.calorieLimit || (patient.bmr ? Math.round(patient.bmr * 1.3) : 1500);
           const dosha = patient.constitution || patient.dosha || 'Vata';
           
@@ -388,9 +390,9 @@ Generate complete meal plans for all 7 days with specific foods and calories.`;
             weight: patient.weight || 65,
             height: patient.height || 165,
             gender: patient.gender || 'Female',
-            activityLevel: patient.activityLevel || 'moderate',
-            dietaryRestrictions: patient.dietaryRestrictions || [],
-            healthGoals: patient.healthGoals || ['general wellness'],
+            activityLevel: humanize(profile.activityLevel),
+            dietaryRestrictions: [humanize(profile.dietType), ...profile.allergies.map((a) => `no ${a}`)],
+            healthGoals: profile.healthGoals.length ? profile.healthGoals : [humanize(profile.weightGoal)],
             constitution: dosha,
             dosha: dosha,
             calorieLimit: calorieLimit,

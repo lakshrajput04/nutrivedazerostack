@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
 const db = require('../config/database');
+const { getPatientProfile, humanize } = require('../services/patientProfile');
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 
@@ -13,6 +14,7 @@ const ACTIVITY_MULTIPLIERS = {
   light: 1.375,
   moderate: 1.55,
   active: 1.725,
+  very_active: 1.9, // value sent by the registration form
   veryActive: 1.9
 };
 
@@ -143,16 +145,18 @@ class DietChartController {
 
       console.log(`Loaded ${foods.length} foods and ${recipes.length} recipes`);
 
+      const profile = getPatientProfile(patient);
+
       // Filter data based on patient's dosha, allergies, and dietary preferences
       console.log('Filtering foods based on dosha, allergies, and dietary preferences...');
-      const doshaBalancingFoods = filterFoodsByDosha(foods, patient.dosha, patient.allergies);
+      const doshaBalancingFoods = filterFoodsByDosha(foods, patient.dosha, profile.allergies);
       const breakfastRecipes = filterRecipesByDoshaAndMeal(recipes, patient.dosha, 'breakfast');
       const lunchRecipes = filterRecipesByDoshaAndMeal(recipes, patient.dosha, 'lunch');
       const dinnerRecipes = filterRecipesByDoshaAndMeal(recipes, patient.dosha, 'dinner');
       const snackRecipes = filterRecipesByDoshaAndMeal(recipes, patient.dosha, 'snack');
 
       // Calculate scientifically accurate calorie needs based on BMI and activity level
-      const activityMultiplier = ACTIVITY_MULTIPLIERS[patient.activityLevel?.toLowerCase()] || ACTIVITY_MULTIPLIERS.moderate;
+      const activityMultiplier = ACTIVITY_MULTIPLIERS[profile.activityLevel.toLowerCase()] || ACTIVITY_MULTIPLIERS.moderate;
       const bmiCategory = getBMICategory(patient.bmi);
       const bmiAdjustment = BMI_CALORIE_ADJUSTMENTS[bmiCategory];
       
@@ -185,20 +189,21 @@ Patient Information:
 - Height: ${patient.height} cm
 - Weight: ${patient.weight} kg
 - BMI: ${patient.bmi}
-- BMR: ${patient.bmr} cal/day
-- Target Calories: ${targetCalories} cal/day (based on ${patient.activityLevel || 'moderate'} activity)
-- Weight Goal: ${(patient.weight_goal || 'weight_maintenance').replace('_', ' ')}
-- Digestion: ${patient.digestion || 'normal'}
-- Water Intake: ${patient.waterIntake || '2-3 liters'}
-- Lifestyle: ${patient.activityLevel || 'moderate'}
-- Sleep: ${patient.sleepPattern || 'normal'}
-- Stress: ${patient.stressLevel || 'moderate'}
-- Work: ${patient.occupation || 'office work'}
-- Allergies: ${(patient.allergies || []).join(', ') || 'none'}
-- Condition: ${(patient.condition || []).join(', ') || 'none'}
-- Region: India
-- Cuisine Preference: ${patient.dietary_habits || 'vegetarian'}
-- Clinical Notes: ${patient.additionalNotes || 'General health maintenance'}
+- BMR: ${Math.round(baseBMR)} cal/day
+- Target Calories: ${finalTargetCalories} cal/day (based on ${humanize(profile.activityLevel)} activity)
+- Weight Goal: ${humanize(profile.weightGoal)}
+- Diet Type: ${humanize(profile.dietType)}
+- Digestion: ${patient.digestion || 'regular'}
+- Water Intake: ${profile.waterIntake}
+- Activity Level: ${humanize(profile.activityLevel)}
+- Sleep: ${humanize(profile.sleepPattern)}
+- Stress: ${humanize(profile.stressLevel)}
+- Work: ${humanize(profile.workType)}
+- Allergies: ${profile.allergies.join(', ') || 'none'}
+- Conditions: ${profile.conditions.join(', ') || 'none'}
+- Region: ${humanize(profile.region)}
+- Cuisine Preference: ${humanize(profile.cuisinePreference)}
+- Clinical Notes: ${profile.clinicalNotes || 'none'}
 
 AVAILABLE DOSHA-BALANCING INGREDIENTS:
 ${doshaBalancingFoods.slice(0, 30).map(food => 
@@ -218,7 +223,9 @@ Rules:
 - Each meal should be culturally appropriate based on cuisine preference.
 - Use ONLY ingredients and recipes from the lists provided above.
 - Focus on ${patient.dosha} dosha balancing foods and recipes.
-- Target daily calories: ${Math.round(patient.bmr * 1.2)} - ${Math.round(patient.bmr * 1.5)} calories.
+- Target daily calories: ${finalTargetCalories - 100} - ${finalTargetCalories + 100} calories.
+- Every meal must fit the diet type (${humanize(profile.dietType)}): vegetarian means no meat, fish or eggs; vegan also excludes dairy and honey.
+- Never include any of the patient's allergens: ${profile.allergies.join(', ') || 'none'}.
 - Show approximate calories per meal.
 - Include Ayurvedic benefits and timing recommendations.
 - IMPORTANT: Generate complete, specific meal details for all 14 days
@@ -296,7 +303,7 @@ Make this a complete, authentic Ayurvedic meal plan using your expertise in trad
             patient_info: {
               name: patient.name,
               dosha: patient.dosha,
-              target_calories: Math.round(patient.bmr * 1.3)
+              target_calories: finalTargetCalories
             },
             days: [],
             general_guidelines: [
@@ -391,7 +398,7 @@ Make this a complete, authentic Ayurvedic meal plan using your expertise in trad
           patient_info: {
             name: patient.name,
             dosha: patient.dosha,
-            target_calories: Math.round(patient.bmr * 1.3)
+            target_calories: finalTargetCalories
           },
           days: Array.from({ length: 14 }, (_, i) => {
             const breakfastRecipe = sampleBreakfastRecipes[i] || sampleBreakfastRecipes[i % sampleBreakfastRecipes.length] || { name: `Day ${i+1} Oatmeal Bowl` };
